@@ -1,17 +1,34 @@
 """
     Creator     : Jayrese Heslop
     Created on  : 5/26/2016 (10:57 P.M.)
-    Last Editted: 5/26/2016 (11:07 P.M.)
+    Last Editted: 5/27/2016 (09:00 P.M.)
 """
 
 import random
 import math
 
 class Neuron(object):
+    """
+        A neuron is a stage of a neural network (sometimes called Nodes)
+        @static (Number) WEIGHT_RANGE - The value at which the weight is scaled at when randomized
+        @static (Number) BIAS_RANGE - The value at which the bias is scaled at when randomized
+        @property (Array<Number>) weights - The weights of the neuron
+        @property (Array<Number>) bias - The bias of the neuron (sometimes thought of as a special weight)
+        @property (Array<Number>) last_output - The last output produced by the neuron (used for training)
+        @property (Array<Number>) last_input - The last inputs processed by this neuron (used for training)
+        @property (Number) error - The error of the neuron (target - output)
+        @property (Number) delta - The amount that the weights and biases must be adjusted by to closer approximate the test values
+    """
     WEIGHT_RANGE = 0.2
     BIAS_RANGE = 0.2
     
     def __init__(self, num_inputs):
+        """
+            Initializes a neuron
+            @param (Neuron) self - The neuron to initialize
+            @param (Integer) num_inputs - The number of inputs of this neuron
+            @returns (Neuron)
+        """
         self.weights = [random.uniform(-Neuron.WEIGHT_RANGE, Neuron.WEIGHT_RANGE) for i in range(0, num_inputs, 1)]
         self.bias = random.uniform(-Neuron.BIAS_RANGE, Neuron.BIAS_RANGE)
         self.last_output = None
@@ -20,9 +37,15 @@ class Neuron(object):
         self.delta = None
 
     def process(self, inputs):
+        """
+            Processes a set of inputs
+            @param (Neuron) self - The neuron to process the inputs
+            @param (Array<Number>) inputs - The inputs to process
+            @returns (Number) - The output of the neuron
+        """
         self.last_input = inputs
         self.last_output = sum([self.weights[i] * inputs[i] for i in range(0, len(inputs), 1)])
         self.last_output += self.bias
-        self.last_output = 1.0 / (1.0 + pow(math.e, -self.last_output))
+        self.last_output = 1.0 / (1.0 + pow(math.e, -self.last_output)) # sigmoid
         
         return self.last_output

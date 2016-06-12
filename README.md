@@ -1,9 +1,6 @@
-"""
-    Creator     : Jayrese Heslop
-    Created on  : 5/26/2016 (11:13 P.M.)
-    Last Editted: 6/11/2016 (09:04 P.M.)
-"""
-
+#Neural Network in Python (tested with version 3.4.0)
+##Usage
+```python
 from layer import Layer
 from neuron import Neuron
 from network import Network
@@ -75,5 +72,7 @@ outputs = network.process([
     1, 1, 1, 1
 ])
 
-# Print the decimal equivalent of the network's output
-print(sum([(2 ** i) * round(outputs[-i - 1]) for i in range(0, len(outputs), 1)]))
+print(outputs)
+```
+##Credits
+Made by Jayrese Heslop
