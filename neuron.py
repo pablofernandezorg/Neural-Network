@@ -18,19 +18,25 @@ class Neuron(object):
         @property (Array<Number>) last_input - The last inputs processed by this neuron (used for training)
         @property (Number) error - The error of the neuron (target - output)
         @property (Number) delta - The amount that the weights and biases must be adjusted by to closer approximate the test values
+        @property (Function) activation - The activation function to be used to calculate the output
+        @property (Function) derive - The derivative of the activation function
     """
     WEIGHT_RANGE = 0.2
     BIAS_RANGE = 0.2
     
-    def __init__(self, num_inputs):
+    def __init__(self, num_inputs, activation, derivative):
         """
             Initializes a neuron
             @param (Neuron) self - The neuron to initialize
             @param (Integer) num_inputs - The number of inputs of this neuron
+            @param (Function) activation - The activation function to be used to calculate the output
+            @param (Function) derivative - The derivative of the activation function
             @returns (Neuron)
         """
         self.weights = [random.uniform(-Neuron.WEIGHT_RANGE, Neuron.WEIGHT_RANGE) for i in range(0, num_inputs, 1)]
         self.bias = random.uniform(-Neuron.BIAS_RANGE, Neuron.BIAS_RANGE)
+        self.activation = activation
+        self.derive = derivative
         self.last_output = None
         self.last_input = None
         self.error = None
@@ -46,6 +52,6 @@ class Neuron(object):
         self.last_input = inputs
         self.last_output = sum([self.weights[i] * inputs[i] for i in range(0, len(inputs), 1)])
         self.last_output += self.bias
-        self.last_output = 1.0 / (1.0 + pow(math.e, -self.last_output)) # sigmoid
+        self.last_output = self.activation(self.last_output)
         
         return self.last_output

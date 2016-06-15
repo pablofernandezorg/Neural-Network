@@ -9,8 +9,8 @@ from neuron import Neuron
 from network import Network
 
 network = Network()
-network.add_layer(10, 20) # Hidden Layer, 10 Neurons, 20 inputs
-network.add_layer(2)      # Output Layer,  2 Neurons
+network.add_layer(10, 20, Network.ACTIVATION_STEP) # Hidden Layer, 10 Neurons, 20 inputs
+network.add_layer(2,  10, Network.ACTIVATION_STEP) # Output Layer,  2 Neurons, 10 inputs
 
 # Simulate black and white images
 # 0 - Black
@@ -48,15 +48,15 @@ three = [
 ]
 
 # Set some quick properties for the upcoming training session
-ITERATIONS = 500  # Number of iterations per training session
-LEARN_RATE = 0.1  # The rate the network learns on each iteration
-THRESHOLD  = 0.01 # If this precision is reached, the training session is instantly complete
+ITERATIONS = 1000  # Number of iterations per training session
+LEARN_RATE = 0.10  # The rate the network learns on each iteration
+THRESHOLD  = 0.10  # If this precision is reached, the training session is instantly complete
 
 # Perform a quick training session
 for i in range(0, ITERATIONS, 1):
     error = 0
     
-    #        Examples      Inputs   Outputs Learn Rate
+    # Example Data         Inputs   Outputs Learn Rate
     error += network.train(zero,    [0, 0], LEARN_RATE)
     error += network.train(one,     [0, 1], LEARN_RATE)
     error += network.train(two,     [1, 0], LEARN_RATE)
@@ -76,4 +76,4 @@ outputs = network.process([
 ])
 
 # Print the decimal equivalent of the network's output
-print(sum([(2 ** i) * round(outputs[-i - 1]) for i in range(0, len(outputs), 1)]))
+print(sum([(2 ** i) * outputs[-i - 1] for i in range(0, len(outputs), 1)]))

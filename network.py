@@ -8,6 +8,7 @@ from layer import Layer
 from neuron import Neuron
 
 import json
+import math
 
 class Network(object):
     """
@@ -17,8 +18,22 @@ class Network(object):
             The last layer is called the output layer
             All the layers inbetween are called hidden layers
         
+        @static (Function) ACTIVATION_LINEAR - An activation function that does nothing
+        @static (Function) ACTIVATION_TANH - The tanh activation function
+        @static (Function) ACTIVATION_SIGMOID - The sigmoid activation function
+        @static (Function) ACTIVATION_STEP - Simple step activation function (range 0 to 1)
         @property (Array<Layer>) layers - The layers of the neural network
     """
+    ACTIVATION_LINEAR = lambda x: x
+    ACTIVATION_TANH = lambda x: math.tanh(x)
+    ACTIVATION_SIGMOID = lambda x: 1.0 / (1.0 + math.exp(-x))
+    ACTIVATION_STEP = lambda x: 1 if x >= 0 else 0
+
+    DERIVATIVE_LINEAR = lambda x: 1
+    DERIVATIVE_TANH = lambda x: 1.0 - math.tanh(x) ** 2
+    DERIVATIVE_SIGMOID = lambda x: x * (1.0 - x)
+    DERIVATIVE_STEP = lambda x: 1 if abs(x) < 10 ** -4 else 0
+
     def __init__(self):
         """
             Initializes the neural network
@@ -42,21 +57,41 @@ class Network(object):
 
         return outputs
 
-    def add_layer(self, num_neurons, num_inputs=None):
+    def add_layer(self, num_neurons, num_inputs=None, activation=None):
         """
             Adds a layer to the neural network
             @param (Network) self - The network to add the layer to
             @param (Number) - The number of neurons of the layer
             @param (Number) [num_inputs=None] - The number of inputs of the layer
-
+            @param (Function) [activation=None] - The activation function to use for this layer
+            
             Note:
                 If num_inputs is not specified it is the same as the number of inputs of the last layer added
+                If activation is not specified it defaults to ACTIVATION_SIGMOID
+                The only accepted values for activation are:
+                    - ACTIVATION_LINEAR
+                    - ACTIVATION_SIGMOID
+                    - ACTIVATION_TANH
+                    - ACTIVATION_STEP
         """
+
+        # Check if then number of inputs wasn't specified
         if num_inputs == None:
             last_layer = self.layers[-1]
             num_inputs = len(last_layer.neurons)
 
-        self.layers.append(Layer(num_neurons, num_inputs))
+        # Check if the activation function wasn't specified
+        if activation == None:
+            activation = Network.ACTIVATION_SIGMOID
+
+        # Check which activation function was chosen (to choose a derivative)
+        derivative = None
+        if activation == Network.ACTIVATION_LINEAR:      derivative = Network.DERIVATIVE_LINEAR
+        elif activation == Network.ACTIVATION_SIGMOID: derivative = Network.DERIVATIVE_SIGMOID
+        elif activation == Network.ACTIVATION_LINEAR:  derivative = Network.DERIVATIVE_LINEAR
+        elif activation == Network.ACTIVATION_STEP:    derivative = Network.DERIVATIVE_STEP
+
+        self.layers.append(Layer(num_neurons, num_inputs, activation, derivative))
     
     def train(self, inputs, targets, learn_rate):
         """
@@ -80,7 +115,7 @@ class Network(object):
             neuron.error = targets[k] - outputs[k]
             error += 0.5 * neuron.error ** 2
 
-            neuron.delta = neuron.last_output * (1.0 - neuron.last_output) * neuron.error
+            neuron.delta = neuron.derive(neuron.last_output) * neuron.error
         
         # For every other layer (backwards) ...
         for k in range(len(self.layers) - 2, 0 - 1, -1):
@@ -94,7 +129,7 @@ class Network(object):
                 neuron_l.error = sum([neuron.weights[l] * neuron.delta for neuron in layer_next.neurons])
 
                 # Use newtons method for later improvement of the result
-                neuron_l.delta = neuron_l.last_output * (1.0 - neuron_l.last_output) * neuron_l.error
+                neuron_l.delta = neuron.derive(neuron.last_output) * neuron_l.error
 
                 # For every neuron in the next layer
                 for m in range(0, len(layer_next.neurons), 1):

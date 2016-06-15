@@ -1,4 +1,11 @@
 #Neural Network in Python (tested with version 3.4.0)
+##Updates
+Added support for multiple activation functions such as:
+- Linear (f(x) = x)
+- Sigmoid (f(x) = 1 / (1 + e ^ -x))
+- Step (f(x) = 1 {if x >= 0} otherwise f(x) = 0)
+- Tanh (f(x) = tanh(x))
+
 ##Usage
 ```python
 from layer import Layer
@@ -6,8 +13,8 @@ from neuron import Neuron
 from network import Network
 
 network = Network()
-network.add_layer(10, 20) # Hidden Layer, 10 Neurons, 20 inputs
-network.add_layer(2)      # Output Layer,  2 Neurons
+network.add_layer(10, 20, Network.ACTIVATION_STEP) # Hidden Layer, 10 Neurons, 20 inputs
+network.add_layer(2,  10, Network.ACTIVATION_STEP) # Output Layer,  2 Neurons, 10 inputs
 
 # Simulate black and white images
 # 0 - Black
@@ -72,7 +79,9 @@ outputs = network.process([
     1, 1, 1, 1
 ])
 
-print(outputs)
+# Print the decimal equivalent of the network's output (Expected: 2)
+print(sum([(2 ** i) * outputs[-i - 1] for i in range(0, len(outputs), 1)]))
+
 ```
 ##Credits
 Made by Jayrese Heslop
