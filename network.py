@@ -1,7 +1,7 @@
 """
     Creator     : Jayrese Heslop
     Created on  : 5/26/2016 (11:13 P.M.)
-    Last Editted: 6/11/2016 (09:05 A.M.)
+    Last Editted: 6/16/2016 (01:38 A.M.)
 """
 
 from layer import Layer
@@ -21,9 +21,22 @@ class Network(object):
         @static (Function) ACTIVATION_LINEAR - An activation function that does nothing
         @static (Function) ACTIVATION_TANH - The tanh activation function
         @static (Function) ACTIVATION_SIGMOID - The sigmoid activation function
-        @static (Function) ACTIVATION_STEP - Simple step activation function (range 0 to 1)
+        @static (Function) ACTIVATION_STEP - The unit step activation function (range 0 to 1)
+        @static (Function) DERIVATIVE_LINEAR - The derivative of the linear activation function
+        @static (Function) DERIVATIVE_TANH - The derivative of the tanh activation function
+        @static (Function) DERIVATIVE_SIGMOID - The derivative of the sigmoid activation function
+        @static (Function) DERIVATIVE_STEP - The derivative of the unit step activation function
+        @static (Number) LINEAR - Represents the linear activation function. Used for File I/O.
+        @static (Number) TANH - Represents the tanh activation function. Used for File I/O.
+        @static (Number) SIGMOID - Represents the sigmoid activation function. Used for File I/O.
+        @static (Number) STEP - Represents the unit step activation function. Used for File I/O.
         @property (Array<Layer>) layers - The layers of the neural network
     """
+    LINEAR = 0
+    TANH = 1
+    SIGMOID = 2
+    STEP = 3
+    
     ACTIVATION_LINEAR = lambda x: x
     ACTIVATION_TANH = lambda x: math.tanh(x)
     ACTIVATION_SIGMOID = lambda x: 1.0 / (1.0 + math.exp(-x))
@@ -86,10 +99,10 @@ class Network(object):
 
         # Check which activation function was chosen (to choose a derivative)
         derivative = None
-        if activation == Network.ACTIVATION_LINEAR:      derivative = Network.DERIVATIVE_LINEAR
-        elif activation == Network.ACTIVATION_SIGMOID: derivative = Network.DERIVATIVE_SIGMOID
-        elif activation == Network.ACTIVATION_TANH:  derivative = Network.DERIVATIVE_TANH
-        elif activation == Network.ACTIVATION_STEP:    derivative = Network.DERIVATIVE_STEP
+        if activation == Network.ACTIVATION_LINEAR:     derivative = Network.DERIVATIVE_LINEAR
+        elif activation == Network.ACTIVATION_SIGMOID:  derivative = Network.DERIVATIVE_SIGMOID
+        elif activation == Network.ACTIVATION_TANH:     derivative = Network.DERIVATIVE_TANH
+        elif activation == Network.ACTIVATION_STEP:     derivative = Network.DERIVATIVE_STEP
 
         self.layers.append(Layer(num_neurons, num_inputs, activation, derivative))
     
@@ -166,10 +179,18 @@ class Network(object):
                 weights = neuron.weights
                 bias = neuron.bias
 
+                # "Convert" the functions into their number counterparts
+                enum = None
+                if neuron.activation == Network.ACTIVATION_LINEAR:      enum = Network.LINEAR
+                elif neuron.activation == Network.ACTIVATION_SIGMOID:   enum = Network.SIGMOID
+                elif neuron.activation == Network.ACTIVATION_TANH:      enum = Network.TANH
+                elif neuron.activation == Network.ACTIVATION_STEP:      enum = Network.STEP
+
                 # Save the neuron data to a dictionary
                 neuron_data = dict()
                 neuron_data["weights"] = weights
                 neuron_data["bias"] = bias
+                neuron_data["activation"] = enum
 
                 # Add the neuron to the collection
                 layer_neurons.append(neuron_data)
@@ -211,12 +232,38 @@ class Network(object):
                     for neuron in layer["neurons"]:
                         weights = neuron["weights"]
                         bias = neuron["bias"]
+                        activation = neuron["activation"]
 
+                        # Choose the proper activation function and corresponding derivative
+                        activation_func = None
+                        derivative_func = None
+                        if activation == Network.LINEAR:
+                            activation_func = Network.ACTIVATION_LINEAR
+                            derivative_func = Network.DERIVATIVE_LINEAR
+                        elif activation == Network.SIGMOID:
+                            activation_func = Network.ACTIVATION_SIGMOID
+                            derivative_func = Network.DERIVATIVE_SIGMOID
+                        elif activation == Network.TANH:
+                            activation_func = Network.ACTIVATION_TANH
+                            derivative_func = Network.DERIVATIVE_TANH
+                        elif activation == Network.STEP:
+                            activation_func = Network.ACTIVATION_STEP
+                            derivative_func = Network.DERIVATIVE_STEP
+
+                        # Create a neuron with the desired info
+                        neuron = Neuron(0, activation_func, derivative_func)
+                        neuron.weights = weights
+                        neuron.bias = bias
+                        
                         # Add the processed neuron to the collection
-                        neurons.append(Neuron(weights, bias))
+                        neurons.append(neuron)
 
-                    # Create a new layer with this set of neurons
-                    network.add_layer(Layer(neurons))
+                    # Create a layer with the desired neurons
+                    layer = Layer(0, 0, None, None)
+                    layer.neurons = neurons
+                    
+                    # Add the processed layer to the collection
+                    network.layers.append(layer)
         except:
             raise Exception("Invalid Neural Network File @ {}!".format(path))
 

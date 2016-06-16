@@ -1,7 +1,7 @@
 """
     Creator     : Jayrese Heslop
     Created on  : 5/26/2016 (11:08 P.M.)
-    Last Editted: 6/11/2016 (09:03 P.M.)
+    Last Editted: 6/11/2016 (01:38 P.M.)
 """
 
 from neuron import Neuron

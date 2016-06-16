@@ -8,6 +8,7 @@ Added support for multiple activation functions such as:
 
 Fixed the derivation of the tanh activation function.
 Fixed broken logic behind the step function.
+Fixed File I/O
 
 ##Usage
 ```python

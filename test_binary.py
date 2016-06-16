@@ -1,17 +1,21 @@
 """
     Creator     : Jayrese Heslop
     Created on  : 5/26/2016 (11:13 P.M.)
-    Last Editted: 6/11/2016 (09:04 P.M.)
+    Last Editted: 6/16/2016 (01:38 P.M.)
 """
 
 from layer import Layer
 from neuron import Neuron
 from network import Network
 
-
-network = Network()
-network.add_layer(10, 20, Network.ACTIVATION_STEP) # Hidden Layer, 10 Neurons, 20 inputs
-network.add_layer(2,  10, Network.ACTIVATION_STEP) # Output Layer,  2 Neurons, 10 inputs
+try:
+    # Attempt to load the network from a file
+    network = Network.load("test_binary.json")
+except Exception as e:
+    # On failure, recreate the network from scratch
+    network = Network()
+    network.add_layer(10, 20, Network.ACTIVATION_SIGMOID) # Hidden Layer, 10 Neurons, 20 inputs
+    network.add_layer(2,  10, Network.ACTIVATION_SIGMOID) # Output Layer,  2 Neurons, 10 inputs
 
 # Simulate black and white images
 # 0 - Black
@@ -76,5 +80,8 @@ outputs = network.process([
     1, 1, 1, 1
 ])
 
-# Print the decimal equivalent of the network's output
+# Save the neural network to a file
+Network.save("test_binary.json", network)
+
+# Print the decimal equivalent of the network's output (Expected: ~2)
 print(sum([(2 ** i) * outputs[-i - 1] for i in range(0, len(outputs), 1)]))
