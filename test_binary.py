@@ -8,6 +8,7 @@ from layer import Layer
 from neuron import Neuron
 from network import Network
 
+
 network = Network()
 network.add_layer(10, 20, Network.ACTIVATION_STEP) # Hidden Layer, 10 Neurons, 20 inputs
 network.add_layer(2,  10, Network.ACTIVATION_STEP) # Output Layer,  2 Neurons, 10 inputs
@@ -49,8 +50,8 @@ three = [
 
 # Set some quick properties for the upcoming training session
 ITERATIONS = 1000  # Number of iterations per training session
-LEARN_RATE = 0.10  # The rate the network learns on each iteration
-THRESHOLD  = 0.10  # If this precision is reached, the training session is instantly complete
+LEARN_RATE = 0.03  # The rate the network learns on each iteration
+THRESHOLD  = 0.001 # If this precision is reached, the training session is instantly complete
 
 # Perform a quick training session
 for i in range(0, ITERATIONS, 1):

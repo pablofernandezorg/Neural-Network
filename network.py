@@ -30,9 +30,9 @@ class Network(object):
     ACTIVATION_STEP = lambda x: 1 if x >= 0 else 0
 
     DERIVATIVE_LINEAR = lambda x: 1
-    DERIVATIVE_TANH = lambda x: 1.0 - math.tanh(x) ** 2
+    DERIVATIVE_TANH = lambda x: 1.0 - x ** 2
     DERIVATIVE_SIGMOID = lambda x: x * (1.0 - x)
-    DERIVATIVE_STEP = lambda x: 1 if abs(x) < 10 ** -4 else 0
+    DERIVATIVE_STEP = lambda x: 0 if abs(x) < 10 ** -4 else 1
 
     def __init__(self):
         """
@@ -88,7 +88,7 @@ class Network(object):
         derivative = None
         if activation == Network.ACTIVATION_LINEAR:      derivative = Network.DERIVATIVE_LINEAR
         elif activation == Network.ACTIVATION_SIGMOID: derivative = Network.DERIVATIVE_SIGMOID
-        elif activation == Network.ACTIVATION_LINEAR:  derivative = Network.DERIVATIVE_LINEAR
+        elif activation == Network.ACTIVATION_TANH:  derivative = Network.DERIVATIVE_TANH
         elif activation == Network.ACTIVATION_STEP:    derivative = Network.DERIVATIVE_STEP
 
         self.layers.append(Layer(num_neurons, num_inputs, activation, derivative))

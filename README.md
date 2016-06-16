@@ -3,8 +3,11 @@
 Added support for multiple activation functions such as:
 - Linear (f(x) = x)
 - Sigmoid (f(x) = 1 / (1 + e ^ -x))
-- Step (f(x) = 1 {if x >= 0} otherwise f(x) = 0)
+- Step (f(x) = 1 {if x > 0} otherwise f(x) = 0)
 - Tanh (f(x) = tanh(x))
+
+Fixed the derivation of the tanh activation function.
+Fixed broken logic behind the step function.
 
 ##Usage
 ```python
